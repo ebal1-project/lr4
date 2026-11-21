@@ -1,0 +1,73 @@
+@startuml
+title Иерархия классов кроссовок (вариант 3)
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+package "com.example.sneakers" {
+
+  abstract class Sneakers {
+    - name : String
+    - cost : double
+    - type : String
+    - producer : Producer
+    # Sneakers(name : String, cost : double, type : String,\n    producerName : String, producerCountry : String)
+    + getName() : String
+    + getCost() : double
+    + getType() : String
+    + getProducerName() : String
+    + getProducerCountry() : String
+    + toString() : String
+  }
+
+  class "Sneakers.Producer" as Producer <<private inner>> {
+    - name : String
+    - country : String
+    ~ getName() : String
+    ~ getCountry() : String
+    + toString() : String
+  }
+
+  class FootballSneakers {
+    + {static} TYPE : String
+  }
+  class BasketballSneakers {
+    + {static} TYPE : String
+  }
+  class RunningSneakers {
+    + {static} TYPE : String
+  }
+  class TennisSneakers <<новый тип, п. 7>> {
+    + {static} TYPE : String
+  }
+
+  class SneakersStatistics <<utility>> {
+    - SneakersStatistics()
+    + {static} countProducers(sneakers : List<? extends Sneakers>) : long
+    + {static} averageCostByProducer(sneakers : List<? extends Sneakers>) : Map<String, Double>
+    + {static} averageCostByType(sneakers : List<? extends Sneakers>) : Map<String, Double>
+  }
+}
+
+package "com.example.app" {
+  class Main {
+    + {static} main(args : String[]) : void
+    - {static} createShoes() : List<Sneakers>
+    - {static} printStatistics(shoes : List<Sneakers>) : void
+    - {static} printMap(map : Map<String, Double>) : void
+  }
+}
+
+' Наследование
+Sneakers <|-- FootballSneakers
+Sneakers <|-- BasketballSneakers
+Sneakers <|-- RunningSneakers
+Sneakers <|-- TennisSneakers
+
+' Композиция: Producer не существует без Sneakers
+Sneakers *-- "1" Producer : producer
+
+' Зависимости
+SneakersStatistics ..> Sneakers : анализирует
+Main ..> Sneakers : создаёт
+Main ..> SneakersStatistics : вызывает
+@enduml
